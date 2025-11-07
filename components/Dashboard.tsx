@@ -4,6 +4,7 @@ import { UserProfile, NutritionInfo, DashboardView, ScanMode, MealPlan, Shopping
 import { analyzeFoodImage, generateMealPlan, generateShoppingList, generateWorkoutPlan } from '../services/geminiService';
 import { SunIcon, MoonIcon, CameraIcon, QrCodeIcon, UploadIcon, UserIcon, LogoutIcon, LanguageIcon, ChevronDownIcon, CheckCircleIcon, AlertTriangleIcon, XCircleIcon, TrendingUpIcon, HistoryIcon, HomeIcon, MealPlanIcon, CommunityIcon, DumbbellIcon, UsersIcon, BrainCircuitIcon, SparklesIcon, ThumbsUpIcon, MessageCircleIcon, ChevronLeftIcon, MenuIcon, XIcon } from './Icons';
 import { useLanguage } from '../App';
+import { Chatbot } from './Chatbot';
 
 type Page = 'DASHBOARD' | 'PROGRESS' | 'HISTORY' | 'MEAL_PLAN' | 'WORKOUTS' | 'WELLNESS' | 'COMMUNITY' | 'CONSULTATIONS';
 
@@ -117,7 +118,8 @@ interface CameraViewProps {
 const CameraView: React.FC<CameraViewProps> = ({ onCapture, onCancel, scanMode }) => {
     const videoRef = useRef<HTMLVideoElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
-    const animationFrameId = useRef<number>();
+    // FIX: Initialize useRef with null to provide a defined initial value.
+    const animationFrameId = useRef<number | null>(null);
 
     const scanQRCode = useCallback(() => {
         if (videoRef.current && videoRef.current.readyState === videoRef.current.HAVE_ENOUGH_DATA) {
@@ -1022,6 +1024,7 @@ const Dashboard: React.FC<DashboardProps> = ({ userProfile, onLogout }) => {
                    {renderMainContent()}
                 </main>
             </div>
+            <Chatbot userProfile={userProfile} />
         </div>
     );
 };
