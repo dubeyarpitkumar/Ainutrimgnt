@@ -250,32 +250,32 @@ const AnalysisResult: React.FC<{ result: NutritionInfo, onBack: () => void, scan
                 {scannedImage && (
                     <img src={scannedImage} alt={result.foodName} className="w-full h-64 object-cover" />
                 )}
-                <div className="p-6 space-y-4">
-                    <h2 className="text-3xl font-bold text-center capitalize">{result.foodName}</h2>
-                    <div className={`flex items-center space-x-3 p-3 rounded-lg ${getRecommendationColor()}`}>
+                <div className="p-6 space-y-5">
+                    <h2 className="text-4xl font-bold text-center capitalize">{result.foodName}</h2>
+                    <div className={`flex items-center justify-center space-x-3 p-3 rounded-lg ${getRecommendationColor()}`}>
                         {getRecommendationIcon()}
-                        <span className="font-semibold">{getRecommendationText(result.recommendation)}</span>
+                        <span className="font-semibold text-lg">{getRecommendationText(result.recommendation)}</span>
                     </div>
-                    <p className="text-gray-600 dark:text-gray-400 text-sm italic">"{result.reason}"</p>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center pt-4 border-t dark:border-gray-700">
+                    <p className="text-gray-600 dark:text-gray-400 text-base leading-relaxed text-center">"{result.reason}"</p>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center pt-5 border-t dark:border-gray-700">
                         <div>
-                            <p className="text-2xl font-bold text-primary-500">{result.nutrition.calories}</p>
+                            <p className="text-3xl font-bold text-primary-500">{result.nutrition.calories}</p>
                             <p className="text-sm text-gray-500 dark:text-gray-400">{t('calories')} (kcal)</p>
                         </div>
                         <div>
-                            <p className="text-2xl font-bold text-primary-500">{result.nutrition.protein}</p>
+                            <p className="text-3xl font-bold text-primary-500">{result.nutrition.protein}</p>
                             <p className="text-sm text-gray-500 dark:text-gray-400">{t('protein')} (g)</p>
                         </div>
                         <div>
-                            <p className="text-2xl font-bold text-primary-500">{result.nutrition.carbs}</p>
+                            <p className="text-3xl font-bold text-primary-500">{result.nutrition.carbs}</p>
                             <p className="text-sm text-gray-500 dark:text-gray-400">{t('carbs')} (g)</p>
                         </div>
                         <div>
-                            <p className="text-2xl font-bold text-primary-500">{result.nutrition.fats}</p>
+                            <p className="text-3xl font-bold text-primary-500">{result.nutrition.fats}</p>
                             <p className="text-sm text-gray-500 dark:text-gray-400">{t('fats')} (g)</p>
                         </div>
                     </div>
-                    <div className="text-center pt-4 border-t dark:border-gray-700">
+                    <div className="text-center pt-5 border-t dark:border-gray-700">
                         <p className="text-sm text-gray-500 dark:text-gray-400">{t('suggestedServingSize')}</p>
                         <p className="text-lg font-semibold">{result.servingSize}</p>
                     </div>
@@ -739,7 +739,8 @@ const SidebarNav: React.FC<{
 // FIX: Define a named type for the component props to avoid issues with anonymous types in JSX.
 type NavButtonProps = { page: Page; icon: React.ElementType; label: string; isPremium?: boolean };
 
-    const NavButton = ({ page, icon: Icon, label, isPremium }: NavButtonProps) => (
+// FIX: Explicitly type NavButton as a React.FC to correctly handle the special 'key' prop.
+    const NavButton: React.FC<NavButtonProps> = ({ page, icon: Icon, label, isPremium }) => (
         <button
             onClick={() => onPageChange(page)}
             className={`relative flex items-center p-2 rounded-lg transition-colors w-full ${activePage === page ? 'bg-primary-100 dark:bg-primary-900/50 text-primary-600 dark:text-primary-300' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'} ${isCollapsed ? 'justify-center' : ''}`}
