@@ -216,7 +216,7 @@ const CameraView: React.FC<CameraViewProps> = ({ onCapture, onCancel, scanMode }
 };
 
 // Helper: Analysis Result
-const AnalysisResult: React.FC<{ result: NutritionInfo, onBack: () => void }> = ({ result, onBack }) => {
+const AnalysisResult: React.FC<{ result: NutritionInfo, onBack: () => void, scannedImage: string | null }> = ({ result, onBack, scannedImage }) => {
     const { t } = useLanguage();
 
     const getRecommendationText = (recommendation: NutritionInfo['recommendation']) => {
@@ -246,34 +246,39 @@ const AnalysisResult: React.FC<{ result: NutritionInfo, onBack: () => void }> = 
     
     return (
         <div className="w-full max-w-2xl mx-auto p-4 md:p-6 space-y-6">
-            <h2 className="text-3xl font-bold text-center capitalize">{result.foodName}</h2>
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg space-y-4">
-                <div className={`flex items-center space-x-3 p-3 rounded-lg ${getRecommendationColor()}`}>
-                    {getRecommendationIcon()}
-                    <span className="font-semibold">{getRecommendationText(result.recommendation)}</span>
-                </div>
-                 <p className="text-gray-600 dark:text-gray-400 text-sm italic">"{result.reason}"</p>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center pt-4 border-t dark:border-gray-700">
-                    <div>
-                        <p className="text-2xl font-bold text-primary-500">{result.nutrition.calories}</p>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">{t('calories')} (kcal)</p>
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
+                {scannedImage && (
+                    <img src={scannedImage} alt={result.foodName} className="w-full h-64 object-cover" />
+                )}
+                <div className="p-6 space-y-4">
+                    <h2 className="text-3xl font-bold text-center capitalize">{result.foodName}</h2>
+                    <div className={`flex items-center space-x-3 p-3 rounded-lg ${getRecommendationColor()}`}>
+                        {getRecommendationIcon()}
+                        <span className="font-semibold">{getRecommendationText(result.recommendation)}</span>
                     </div>
-                     <div>
-                        <p className="text-2xl font-bold text-primary-500">{result.nutrition.protein}</p>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">{t('protein')} (g)</p>
+                    <p className="text-gray-600 dark:text-gray-400 text-sm italic">"{result.reason}"</p>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center pt-4 border-t dark:border-gray-700">
+                        <div>
+                            <p className="text-2xl font-bold text-primary-500">{result.nutrition.calories}</p>
+                            <p className="text-sm text-gray-500 dark:text-gray-400">{t('calories')} (kcal)</p>
+                        </div>
+                        <div>
+                            <p className="text-2xl font-bold text-primary-500">{result.nutrition.protein}</p>
+                            <p className="text-sm text-gray-500 dark:text-gray-400">{t('protein')} (g)</p>
+                        </div>
+                        <div>
+                            <p className="text-2xl font-bold text-primary-500">{result.nutrition.carbs}</p>
+                            <p className="text-sm text-gray-500 dark:text-gray-400">{t('carbs')} (g)</p>
+                        </div>
+                        <div>
+                            <p className="text-2xl font-bold text-primary-500">{result.nutrition.fats}</p>
+                            <p className="text-sm text-gray-500 dark:text-gray-400">{t('fats')} (g)</p>
+                        </div>
                     </div>
-                     <div>
-                        <p className="text-2xl font-bold text-primary-500">{result.nutrition.carbs}</p>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">{t('carbs')} (g)</p>
+                    <div className="text-center pt-4 border-t dark:border-gray-700">
+                        <p className="text-sm text-gray-500 dark:text-gray-400">{t('suggestedServingSize')}</p>
+                        <p className="text-lg font-semibold">{result.servingSize}</p>
                     </div>
-                     <div>
-                        <p className="text-2xl font-bold text-primary-500">{result.nutrition.fats}</p>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">{t('fats')} (g)</p>
-                    </div>
-                </div>
-                <div className="text-center pt-4 border-t dark:border-gray-700">
-                    <p className="text-sm text-gray-500 dark:text-gray-400">{t('suggestedServingSize')}</p>
-                    <p className="text-lg font-semibold">{result.servingSize}</p>
                 </div>
             </div>
             <button onClick={onBack} className="w-full py-3 bg-primary-600 text-white rounded-lg font-semibold hover:bg-primary-700 transition-colors">{t('scanAnotherItem')}</button>
@@ -751,10 +756,11 @@ type NavButtonProps = { page: Page; icon: React.ElementType; label: string; isPr
 
     return (
         <nav className="flex flex-col space-y-2">
-            {/* FIX: Explicitly pass props instead of spreading to avoid potential type issues. */}
-            {navItems.map(item => <NavButton key={item.page} page={item.page} icon={item.icon} label={item.label} />)}
+            {/* FIX: Destructure item in map to help with TypeScript type inference. */}
+            {navItems.map(({ page, icon, label }) => <NavButton key={page} page={page} icon={icon} label={label} />)}
             <div className="pt-2 mt-2 border-t dark:border-gray-700">
-                {secondaryNavItems.map(item => <NavButton key={item.page} page={item.page} icon={item.icon} label={item.label} isPremium={item.premium} />)}
+                {/* FIX: Destructure item in map to help with TypeScript type inference. */}
+                {secondaryNavItems.map(({ page, icon, label, premium }) => <NavButton key={page} page={page} icon={icon} label={label} isPremium={premium} />)}
             </div>
         </nav>
     );
@@ -797,6 +803,7 @@ const Dashboard: React.FC<DashboardProps> = ({ userProfile, onLogout }) => {
     const [analysisResult, setAnalysisResult] = useState<NutritionInfo | null>(null);
     const [error, setError] = useState<string | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const [scannedImageUrl, setScannedImageUrl] = useState<string | null>(null);
 
     const [activePage, setActivePage] = useState<Page>('DASHBOARD');
     const [scanHistory, setScanHistory] = useState<NutritionInfo[]>(() => {
@@ -876,9 +883,10 @@ const Dashboard: React.FC<DashboardProps> = ({ userProfile, onLogout }) => {
             setView('ANALYZING');
             const reader = new FileReader();
             reader.onloadend = () => {
-                const base64String = reader.result?.toString().split(',')[1];
-                if(base64String) {
-                    performAnalysis(base64String, file.type, 'food');
+                const dataUrl = reader.result?.toString();
+                const base64String = dataUrl?.split(',')[1];
+                if(base64String && dataUrl) {
+                    performAnalysis(base64String, file.type, 'food', dataUrl);
                 } else {
                     setError("Could not read file.");
                     setView('ERROR');
@@ -888,10 +896,11 @@ const Dashboard: React.FC<DashboardProps> = ({ userProfile, onLogout }) => {
         }
     };
     
-    const performAnalysis = useCallback(async (data: string, mimeType: string, mode: ScanMode) => {
+    const performAnalysis = useCallback(async (data: string, mimeType: string, mode: ScanMode, imageUrl: string) => {
         if (!mode) return;
         setView('ANALYZING');
         setError(null);
+        setScannedImageUrl(imageUrl);
         try {
             let result = await analyzeFoodImage(data, mimeType, userProfile, mode);
             result = await translateNutritionInfo(result, language);
@@ -915,7 +924,8 @@ const Dashboard: React.FC<DashboardProps> = ({ userProfile, onLogout }) => {
     }, [userProfile, scanHistory, language]);
     
     const handleCapture = (imageData: string, mimeType: string) => {
-        performAnalysis(imageData, mimeType, scanMode);
+        const dataUrl = `data:${mimeType};base64,${imageData}`;
+        performAnalysis(imageData, mimeType, scanMode, dataUrl);
     };
 
     const resetView = () => {
@@ -923,6 +933,7 @@ const Dashboard: React.FC<DashboardProps> = ({ userProfile, onLogout }) => {
         setScanMode(null);
         setAnalysisResult(null);
         setError(null);
+        setScannedImageUrl(null);
         if (fileInputRef.current) {
             fileInputRef.current.value = "";
         }
@@ -989,7 +1000,7 @@ const Dashboard: React.FC<DashboardProps> = ({ userProfile, onLogout }) => {
                     </div>
                 );
             case 'RESULT':
-                return analysisResult ? <AnalysisResult result={analysisResult} onBack={resetView} /> : <div/>;
+                return analysisResult ? <AnalysisResult result={analysisResult} onBack={resetView} scannedImage={scannedImageUrl} /> : <div/>;
             case 'ERROR':
                  return (
                     <div className="flex flex-col items-center justify-center h-full space-y-4 text-center p-4">
