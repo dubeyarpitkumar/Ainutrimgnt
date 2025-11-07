@@ -1,3 +1,4 @@
+
 import React from 'react';
 
 export const SunIcon = ({ className }: { className?: string }) => (
@@ -106,8 +107,8 @@ export const XCircleIcon = ({ className }: { className?: string }) => (
 
 export const TrendingUpIcon = ({ className }: { className?: string }) => (
     <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
-        <polyline points="17 6 23 6 23 12"></polyline>
+        <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline>
+        <polyline points="16 7 22 7 22 13"></polyline>
     </svg>
 );
 
@@ -115,7 +116,7 @@ export const HistoryIcon = ({ className }: { className?: string }) => (
     <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
         <path d="M3 3v5h5"></path>
-        <path d="M12 7v5l4 2"></path>
+        <path d="M12 7v5l3 3"></path>
     </svg>
 );
 
@@ -128,45 +129,39 @@ export const HomeIcon = ({ className }: { className?: string }) => (
 
 export const MealPlanIcon = ({ className }: { className?: string }) => (
     <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-        <line x1="16" y1="2" x2="16" y2="6"></line>
-        <line x1="8" y1="2" x2="8" y2="6"></line>
-        <line x1="3" y1="10" x2="21" y2="10"></line>
-        <path d="M8 14h.01"></path>
-        <path d="M12 14h.01"></path>
-        <path d="M16 14h.01"></path>
-        <path d="M8 18h.01"></path>
-        <path d="M12 18h.01"></path>
-        <path d="M16 18h.01"></path>
+        <path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/>
+        <path d="M7 2v20"/>
+        <path d="M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3z"/>
     </svg>
 );
 
 export const CommunityIcon = ({ className }: { className?: string }) => (
     <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-        <circle cx="9" cy="7" r="4"></circle>
-        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+        <path d="M18 21a8 8 0 0 0-16 0"></path>
+        <circle cx="10" cy="8" r="4"></circle>
+        <path d="M22 20c0-3.37-2-6.5-4-8a5 5 0 0 0-10 0c-2 1.5-4 4.63-4 8"></path>
     </svg>
 );
 
 export const DumbbellIcon = ({ className }: { className?: string }) => (
     <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M14.4 14.4 9.6 9.6M9.6 14.4 14.4 9.6M2 12h2M12 2v2M20 12h2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M19.1 4.9l-1.4 1.4M6.3 17.7l-1.4 1.4"></path>
-        <path d="M8 8a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"></path>
-        <path d="M16 8a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"></path>
-        <path d="M16 16a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"></path>
-        <path d="M8 16a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"></path>
+        <path d="m6.5 6.5 11 11"/>
+        <path d="m21 21-1-1"/>
+        <path d="m3 3 1 1"/>
+        <path d="m18 22 4-4"/>
+        <path d="m6 2-4 4"/>
+        <path d="m10 10-1.5 1.5"/>
+        <path d="m14 14 1.5-1.5"/>
+        <path d="M18 6a3 3 0 0 0-3-3h-1"/>
+        <path d="M6 18a3 3 0 0 0 3 3h1"/>
     </svg>
 );
 
 
 export const UsersIcon = ({ className }: { className?: string }) => (
     <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
-        <circle cx="9" cy="7" r="4"></circle>
-        <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
-        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+        <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+        <path d="M6 12v5c3.33 1.67 6.67 1.67 10 0v-5"/>
     </svg>
 );
 
@@ -181,6 +176,13 @@ export const BrainCircuitIcon = ({ className }: { className?: string }) => (
         <path d="M12 15a7 7 0 0 0-6.5 5.5"></path>
         <path d="M12 5a7 7 0 0 0-6.5 5.5"></path>
         <path d="M14.5 9.5a3 3 0 1 0-3 3"></path>
+    </svg>
+);
+
+export const WellnessIcon = ({ className }: { className?: string }) => (
+    <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path>
+        <path d="M3.22 12H9.5l.5-1 2 4.5 2-7 1.5 3.5h5.27"></path>
     </svg>
 );
 

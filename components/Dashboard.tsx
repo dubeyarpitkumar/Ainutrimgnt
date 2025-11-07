@@ -1,8 +1,9 @@
+
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { UserProfile, NutritionInfo, DashboardView, ScanMode, MealPlan, ShoppingList, WorkoutPlan, MoodLog, CommunityPost } from '../types';
 import { analyzeFoodImage, generateMealPlan, generateShoppingList, generateWorkoutPlan } from '../services/geminiService';
 import { translateNutritionInfo, translateMealPlan, translateShoppingList, translateWorkoutPlan } from '../utils/translator';
-import { SunIcon, MoonIcon, CameraIcon, QrCodeIcon, UploadIcon, UserIcon, LogoutIcon, LanguageIcon, ChevronDownIcon, CheckCircleIcon, AlertTriangleIcon, XCircleIcon, TrendingUpIcon, HistoryIcon, HomeIcon, MealPlanIcon, CommunityIcon, DumbbellIcon, UsersIcon, BrainCircuitIcon, SparklesIcon, ThumbsUpIcon, MessageCircleIcon, ChevronLeftIcon, MenuIcon, XIcon } from './Icons';
+import { SunIcon, MoonIcon, CameraIcon, QrCodeIcon, UploadIcon, UserIcon, LogoutIcon, LanguageIcon, ChevronDownIcon, CheckCircleIcon, AlertTriangleIcon, XCircleIcon, TrendingUpIcon, HistoryIcon, HomeIcon, MealPlanIcon, CommunityIcon, DumbbellIcon, UsersIcon, WellnessIcon, SparklesIcon, ThumbsUpIcon, MessageCircleIcon, ChevronLeftIcon, MenuIcon, XIcon } from './Icons';
 import { useLanguage } from '../App';
 import { Chatbot } from './Chatbot';
 
@@ -721,7 +722,7 @@ const SidebarNav: React.FC<{
         { page: 'DASHBOARD', icon: HomeIcon, label: t('dashboard') },
         { page: 'MEAL_PLAN', icon: MealPlanIcon, label: t('mealPlan') },
         { page: 'WORKOUTS', icon: DumbbellIcon, label: t('workouts') },
-        { page: 'WELLNESS', icon: BrainCircuitIcon, label: t('wellness') },
+        { page: 'WELLNESS', icon: WellnessIcon, label: t('wellness') },
         { page: 'PROGRESS', icon: TrendingUpIcon, label: t('trackProgress') },
         { page: 'HISTORY', icon: HistoryIcon, label: t('history') },
     ] as const;
