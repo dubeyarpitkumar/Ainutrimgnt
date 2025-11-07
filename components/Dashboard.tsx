@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { UserProfile, NutritionInfo, DashboardView, ScanMode, MealPlan, ShoppingList, WorkoutPlan, MoodLog, CommunityPost } from '../types';
 import { analyzeFoodImage, generateMealPlan, generateShoppingList, generateWorkoutPlan } from '../services/geminiService';
@@ -696,6 +695,25 @@ const Dashboard: React.FC<DashboardProps> = ({ userProfile, onLogout }) => {
         return saved ? JSON.parse(saved) : [];
     });
     
+    // Dynamic Theming Effect
+    useEffect(() => {
+        const goal = userProfile.primaryGoal;
+        const root = document.documentElement;
+
+        if (goal.type === 'Medical') {
+            root.setAttribute('data-theme', 'blue');
+        } else if (goal.type === 'Fitness' && goal.detail === 'Muscle Gain') {
+            root.setAttribute('data-theme', 'orange');
+        } else {
+            root.removeAttribute('data-theme');
+        }
+
+        // Cleanup function to remove the theme when the dashboard unmounts (e.g., on logout)
+        return () => {
+            root.removeAttribute('data-theme');
+        }
+    }, [userProfile.primaryGoal]);
+
     useEffect(() => {
         setDailyProgress(prev => ({ ...prev, waterGoal: Math.round(userProfile.weight * 35) }));
     }, [userProfile.weight]);
