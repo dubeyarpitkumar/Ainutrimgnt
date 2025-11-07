@@ -7,6 +7,9 @@ import { useLanguage } from '../App';
 
 type Page = 'DASHBOARD' | 'PROGRESS' | 'HISTORY' | 'MEAL_PLAN' | 'WORKOUTS' | 'WELLNESS' | 'COMMUNITY' | 'CONSULTATIONS';
 
+// Declare jsQR for TypeScript
+declare const jsQR: any;
+
 // Helper: Theme Toggle
 const ThemeToggle = () => {
     const [isDarkMode, setIsDarkMode] = useState(localStorage.getItem('theme') === 'dark');
@@ -114,6 +117,33 @@ interface CameraViewProps {
 const CameraView: React.FC<CameraViewProps> = ({ onCapture, onCancel, scanMode }) => {
     const videoRef = useRef<HTMLVideoElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
+    const animationFrameId = useRef<number>();
+
+    const scanQRCode = useCallback(() => {
+        if (videoRef.current && videoRef.current.readyState === videoRef.current.HAVE_ENOUGH_DATA) {
+            const video = videoRef.current;
+            const canvas = canvasRef.current;
+            if (canvas) {
+                const context = canvas.getContext('2d');
+                if (context) {
+                    canvas.height = video.videoHeight;
+                    canvas.width = video.videoWidth;
+                    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                    const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+                    const code = jsQR(imageData.data, imageData.width, imageData.height, {
+                        inversionAttempts: "dontInvert",
+                    });
+                    if (code) {
+                        onCapture(code.data, 'text/plain');
+                        // No need to stop loop here, component will unmount on parent state change
+                        return; 
+                    }
+                }
+            }
+        }
+        animationFrameId.current = requestAnimationFrame(scanQRCode);
+    }, [onCapture]);
+
 
     useEffect(() => {
         let stream: MediaStream | null = null;
@@ -122,6 +152,12 @@ const CameraView: React.FC<CameraViewProps> = ({ onCapture, onCancel, scanMode }
                 stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
                 if (videoRef.current) {
                     videoRef.current.srcObject = stream;
+                    // Start scanning loop only when video metadata is loaded
+                    videoRef.current.onloadedmetadata = () => {
+                         if (scanMode === 'qr') {
+                            animationFrameId.current = requestAnimationFrame(scanQRCode);
+                        }
+                    };
                 }
             } catch (err) {
                 console.error("Error accessing camera:", err);
@@ -133,9 +169,12 @@ const CameraView: React.FC<CameraViewProps> = ({ onCapture, onCancel, scanMode }
         startCamera();
         
         return () => {
+            if (animationFrameId.current) {
+                cancelAnimationFrame(animationFrameId.current);
+            }
             stream?.getTracks().forEach(track => track.stop());
         };
-    }, [onCancel]);
+    }, [onCancel, scanMode, scanQRCode]);
     
     const handleCapture = () => {
         if (videoRef.current && canvasRef.current) {
@@ -152,11 +191,6 @@ const CameraView: React.FC<CameraViewProps> = ({ onCapture, onCancel, scanMode }
             }
         }
     };
-    
-    const handleQrScan = () => {
-        const mockQrData = '{"product": "Healthy Choice Oatmeal", "calories": 150, "protein": 5, "carbs": 30, "fats": 2}';
-        onCapture(mockQrData, 'text/plain');
-    };
 
     return (
         <div className="fixed inset-0 bg-black/80 flex flex-col items-center justify-center z-50">
@@ -164,14 +198,16 @@ const CameraView: React.FC<CameraViewProps> = ({ onCapture, onCancel, scanMode }
                  <video ref={videoRef} autoPlay playsInline className="w-full h-full object-cover rounded-lg"></video>
                  <div className="absolute inset-0 border-4 border-primary-500 rounded-lg pointer-events-none opacity-50"></div>
             </div>
-            <p className="text-white mt-4">{scanMode === 'food' ? 'Position food in the frame' : 'Scan QR or Barcode'}</p>
+            <p className="text-white mt-4">{scanMode === 'food' ? 'Position food in the frame' : 'Scanning for QR code...'}</p>
             <canvas ref={canvasRef} className="hidden"></canvas>
             <div className="mt-6 flex space-x-4">
                 <button onClick={onCancel} className="px-6 py-3 bg-gray-600 text-white rounded-full font-semibold">Cancel</button>
-                <button onClick={scanMode === 'food' ? handleCapture : handleQrScan} className="px-6 py-3 bg-primary-600 text-white rounded-full font-semibold flex items-center space-x-2">
-                    <CameraIcon className="w-6 h-6" />
-                    <span>{scanMode === 'food' ? 'Capture' : 'Scan'}</span>
-                </button>
+                {scanMode === 'food' && (
+                    <button onClick={handleCapture} className="px-6 py-3 bg-primary-600 text-white rounded-full font-semibold flex items-center space-x-2">
+                        <CameraIcon className="w-6 h-6" />
+                        <span>Capture</span>
+                    </button>
+                )}
             </div>
         </div>
     );
@@ -690,7 +726,10 @@ const SidebarNav: React.FC<{
         { page: 'CONSULTATIONS', icon: UsersIcon, label: t('consultExperts'), premium: true },
     ] as const;
 
-    const NavButton = ({ page, icon: Icon, label, isPremium }: { page: Page; icon: React.ElementType; label: string; isPremium?: boolean }) => (
+// FIX: Define a named type for the component props to avoid issues with anonymous types in JSX.
+type NavButtonProps = { page: Page; icon: React.ElementType; label: string; isPremium?: boolean };
+
+    const NavButton = ({ page, icon: Icon, label, isPremium }: NavButtonProps) => (
         <button
             onClick={() => onPageChange(page)}
             className={`relative flex items-center p-2 rounded-lg transition-colors w-full ${activePage === page ? 'bg-primary-100 dark:bg-primary-900/50 text-primary-600 dark:text-primary-300' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'} ${isCollapsed ? 'justify-center' : ''}`}
@@ -707,7 +746,8 @@ const SidebarNav: React.FC<{
 
     return (
         <nav className="flex flex-col space-y-2">
-            {navItems.map(item => <NavButton key={item.page} {...item} />)}
+            {/* FIX: Explicitly pass props instead of spreading to avoid potential type issues. */}
+            {navItems.map(item => <NavButton key={item.page} page={item.page} icon={item.icon} label={item.label} />)}
             <div className="pt-2 mt-2 border-t dark:border-gray-700">
                 {secondaryNavItems.map(item => <NavButton key={item.page} page={item.page} icon={item.icon} label={item.label} isPremium={item.premium} />)}
             </div>
