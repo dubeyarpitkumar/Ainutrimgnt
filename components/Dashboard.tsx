@@ -872,7 +872,7 @@ const Dashboard: React.FC<DashboardProps> = ({ userProfile, onLogout }) => {
                     <UserMenu userProfile={userProfile} onLogout={onLogout} />
                 </div>
             </header>
-            <div className="flex flex-1 overflow-hidden">
+            <div className="flex flex-1 overflow-hidden min-h-0">
                 <aside className="w-16 md:w-56 bg-white dark:bg-gray-800 p-2 md:p-4 border-r dark:border-gray-700 hidden sm:block">
                      <nav className="flex flex-col space-y-2">
                         <button onClick={() => { setActivePage('DASHBOARD'); resetView(); }} className={`flex items-center p-2 rounded-lg transition-colors ${activePage === 'DASHBOARD' ? 'bg-primary-100 dark:bg-primary-900/50 text-primary-600 dark:text-primary-300' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'}`}>
