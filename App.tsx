@@ -42,6 +42,34 @@ const translations = {
     heightRequired: "Height is required",
     weightRequired: "Weight is required",
     professionRequired: "Profession is required",
+    selectAge: "Select Age",
+    selectGender: "Select Gender",
+    selectHeight: "Select Height",
+    selectWeight: "Select Weight",
+    selectOne: "Select one",
+    male: "Male",
+    female: "Female",
+    other: "Other",
+    preferNotToSay: "Prefer not to say",
+    professionSedentary: "Sedentary (office job)",
+    professionLightlyActive: "Lightly Active (light exercise 1-3 days/week)",
+    professionModeratelyActive: "Moderately Active (moderate exercise 3-5 days/week)",
+    professionVeryActive: "Very Active (hard exercise 6-7 days/week)",
+    professionOther: "Other",
+    customProfession: "Custom Profession",
+    vegetarian: "Vegetarian",
+    nonVegetarian: "Non-Vegetarian",
+    medicalManagement: "Medical Management",
+    fitnessGoal: "Fitness Goal",
+    goalDiabetes: "Diabetes",
+    goalHypertension: "Hypertension",
+    goalPCOS: "PCOS",
+    goalCustom: "Custom",
+    goalWeightLoss: "Weight Loss",
+    goalMuscleGain: "Muscle Gain",
+    goalMaintenance: "Maintenance",
+    specifyCondition: "Specify condition",
+    specifyGoal: "Specify goal",
     // Dashboard
     helloName: "Hello, {{name}}!",
     readyToTrack: "Ready to track your nutrition?",
@@ -88,7 +116,7 @@ const translations = {
     generatingList: "Generating List...",
     shoppingList: "Shopping List",
     yourWeeklyWorkoutPlan: "Your Weekly Workout Plan",
-    generateNewWorkoutPlan: "Generate New Workout Plan",
+    generateNewWorkoutPlan: "New Workout Plan",
     mentalWellnessCorner: "Mental Wellness Corner",
     howAreYouFeeling: "How are you feeling today?",
     addANote: "Add a note... (optional)",
@@ -146,6 +174,34 @@ const translations = {
     heightRequired: "ऊंचाई आवश्यक है",
     weightRequired: "वजन आवश्यक है",
     professionRequired: "पेशा आवश्यक है",
+    selectAge: "आयु चुनें",
+    selectGender: "लिंग चुनें",
+    selectHeight: "ऊंचाई चुनें",
+    selectWeight: "वजन चुनें",
+    selectOne: "एक चुनें",
+    male: "पुरुष",
+    female: "महिला",
+    other: "अन्य",
+    preferNotToSay: "बताना नहीं चाहते",
+    professionSedentary: "गतिहीन (कार्यालय की नौकरी)",
+    professionLightlyActive: "कम सक्रिय (हल्का व्यायाम 1-3 दिन/सप्ताह)",
+    professionModeratelyActive: "मध्यम रूप से सक्रिय (मध्यम व्यायाम 3-5 दिन/सप्ताह)",
+    professionVeryActive: "बहुत सक्रिय (कठिन व्यायाम 6-7 দিন/सप्ताह)",
+    professionOther: "अन्य",
+    customProfession: "कस्टम पेशा",
+    vegetarian: "शाकाहारी",
+    nonVegetarian: "मांसाहारी",
+    medicalManagement: "चिकित्सा प्रबंधन",
+    fitnessGoal: "फिटनेस लक्ष्य",
+    goalDiabetes: "मधुमेह",
+    goalHypertension: "उच्च रक्तचाप",
+    goalPCOS: "पीसीओएस",
+    goalCustom: "कस्टम",
+    goalWeightLoss: "वजन घटना",
+    goalMuscleGain: "मांसपेशी बनाना",
+    goalMaintenance: "बनाए रखना",
+    specifyCondition: "स्थिति निर्दिष्ट करें",
+    specifyGoal: "लक्ष्य निर्दिष्ट करें",
     // Dashboard
     helloName: "नमस्ते, {{name}}!",
     readyToTrack: "क्या आप अपने पोषण को ट्रैक करने के लिए तैयार हैं?",
@@ -293,6 +349,8 @@ const App: React.FC = () => {
 
     const handleLogout = useCallback(() => {
         setAuthStatus('LOGGED_OUT');
+        // Do not clear userProfile from state, but clear from storage for privacy.
+        // This is a mock app, so we'll just reset the status.
     }, []);
 
     const renderContent = () => {
@@ -305,8 +363,9 @@ const App: React.FC = () => {
                 if (userProfile) {
                     return <Dashboard userProfile={userProfile} onLogout={handleLogout} />;
                 }
-                setAuthStatus('LOGGED_OUT');
-                return <Auth onLoginSuccess={handleLoginSuccess} />;
+                // If profile is missing for a logged-in user, send them back to onboarding.
+                setAuthStatus('ONBOARDING');
+                return <Onboarding onOnboardingComplete={handleOnboardingComplete} />;
             default:
                 return <Auth onLoginSuccess={handleLoginSuccess} />;
         }

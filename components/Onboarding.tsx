@@ -59,6 +59,35 @@ const Onboarding: React.FC<OnboardingProps> = ({ onOnboardingComplete }) => {
         return options;
     };
 
+    const genderOptions = [
+        { value: 'Male', label: t('male') },
+        { value: 'Female', label: t('female') },
+        { value: 'Other', label: t('other') },
+        { value: 'Prefer not to say', label: t('preferNotToSay') }
+    ];
+
+    const professionOptions = [
+        { value: "Sedentary (office job)", label: t('professionSedentary') },
+        { value: "Lightly Active (light exercise 1-3 days/week)", label: t('professionLightlyActive') },
+        { value: "Moderately Active (moderate exercise 3-5 days/week)", label: t('professionModeratelyActive') },
+        { value: "Very Active (hard exercise 6-7 days/week)", label: t('professionVeryActive') },
+        { value: "Other", label: t('professionOther') },
+    ];
+
+    const medicalGoalOptions = [
+        { value: "Diabetes", label: t('goalDiabetes') },
+        { value: "Hypertension", label: t('goalHypertension') },
+        { value: "PCOS", label: t('goalPCOS') },
+        { value: "Custom", label: t('goalCustom') },
+    ];
+
+    const fitnessGoalOptions = [
+        { value: "Weight Loss", label: t('goalWeightLoss') },
+        { value: "Muscle Gain", label: t('goalMuscleGain') },
+        { value: "Maintenance", label: t('goalMaintenance') },
+        { value: "Custom", label: t('goalCustom') },
+    ];
+
     return (
         <div className="min-h-screen bg-gray-100 dark:bg-gray-900 flex items-center justify-center p-4">
             <div className="w-full max-w-2xl p-8 space-y-8 bg-white dark:bg-gray-800 rounded-2xl shadow-lg">
@@ -76,7 +105,7 @@ const Onboarding: React.FC<OnboardingProps> = ({ onOnboardingComplete }) => {
                         <div>
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t('age')}</label>
                             <select name="age" onChange={handleChange} className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500">
-                                <option value="">Select Age</option>
+                                <option value="">{t('selectAge')}</option>
                                 {renderOptions(13, 100)}
                             </select>
                             {errors.age && <p className="text-red-500 text-xs mt-1">{errors.age}</p>}
@@ -85,11 +114,8 @@ const Onboarding: React.FC<OnboardingProps> = ({ onOnboardingComplete }) => {
                         <div>
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t('gender')}</label>
                             <select name="gender" onChange={handleChange} className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500">
-                                <option value="">Select Gender</option>
-                                <option>Male</option>
-                                <option>Female</option>
-                                <option>Other</option>
-                                <option>Prefer not to say</option>
+                                <option value="">{t('selectGender')}</option>
+                                {genderOptions.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
                             </select>
                             {errors.gender && <p className="text-red-500 text-xs mt-1">{errors.gender}</p>}
                         </div>
@@ -97,7 +123,7 @@ const Onboarding: React.FC<OnboardingProps> = ({ onOnboardingComplete }) => {
                         <div>
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t('heightCm')}</label>
                             <select name="height" onChange={handleChange} className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500">
-                                <option value="">Select Height</option>
+                                <option value="">{t('selectHeight')}</option>
                                 {renderOptions(120, 220)}
                             </select>
                             {errors.height && <p className="text-red-500 text-xs mt-1">{errors.height}</p>}
@@ -106,7 +132,7 @@ const Onboarding: React.FC<OnboardingProps> = ({ onOnboardingComplete }) => {
                         <div>
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t('weightKg')}</label>
                             <select name="weight" onChange={handleChange} className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500">
-                                <option value="">Select Weight</option>
+                                <option value="">{t('selectWeight')}</option>
                                 {renderOptions(30, 200)}
                             </select>
                              {errors.weight && <p className="text-red-500 text-xs mt-1">{errors.weight}</p>}
@@ -115,18 +141,14 @@ const Onboarding: React.FC<OnboardingProps> = ({ onOnboardingComplete }) => {
                         <div>
                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t('professionActivityLevel')}</label>
                             <select name="profession" onChange={handleChange} className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500">
-                                <option value="">Select one</option>
-                                <option>Sedentary (office job)</option>
-                                <option>Lightly Active (light exercise 1-3 days/week)</option>
-                                <option>Moderately Active (moderate exercise 3-5 days/week)</option>
-                                <option>Very Active (hard exercise 6-7 days/week)</option>
-                                <option>Other</option>
+                                <option value="">{t('selectOne')}</option>
+                                {professionOptions.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
                             </select>
                             {errors.profession && <p className="text-red-500 text-xs mt-1">{errors.profession}</p>}
                         </div>
                         {profile.profession === 'Other' && (
                              <div>
-                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Custom Profession</label>
+                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t('customProfession')}</label>
                                 <input type="text" name="customProfession" onChange={handleChange} className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500" />
                             </div>
                         )}
@@ -138,11 +160,11 @@ const Onboarding: React.FC<OnboardingProps> = ({ onOnboardingComplete }) => {
                         <div className="mt-2 flex items-center space-x-4">
                            <label className="flex items-center">
                                 <input type="radio" name="dietaryPreference" value="Vegetarian" onChange={handleChange} checked={profile.dietaryPreference === 'Vegetarian'} className="focus:ring-primary-500 h-4 w-4 text-primary-600 border-gray-300" />
-                                <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">Vegetarian</span>
+                                <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">{t('vegetarian')}</span>
                            </label>
                             <label className="flex items-center">
                                 <input type="radio" name="dietaryPreference" value="Non-Vegetarian" onChange={handleChange} checked={profile.dietaryPreference === 'Non-Vegetarian'} className="focus:ring-primary-500 h-4 w-4 text-primary-600 border-gray-300" />
-                                <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">Non-Vegetarian</span>
+                                <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">{t('nonVegetarian')}</span>
                            </label>
                         </div>
                     </div>
@@ -153,34 +175,28 @@ const Onboarding: React.FC<OnboardingProps> = ({ onOnboardingComplete }) => {
                          <div className="mt-2 flex items-center space-x-4">
                            <label className="flex items-center">
                                 <input type="radio" name="type" value="Medical" onChange={handleGoalChange} checked={profile.primaryGoal?.type === 'Medical'} className="focus:ring-primary-500 h-4 w-4 text-primary-600 border-gray-300" />
-                                <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">Medical Management</span>
+                                <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">{t('medicalManagement')}</span>
                            </label>
                             <label className="flex items-center">
                                 <input type="radio" name="type" value="Fitness" onChange={handleGoalChange} checked={profile.primaryGoal?.type === 'Fitness'} className="focus:ring-primary-500 h-4 w-4 text-primary-600 border-gray-300" />
-                                <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">Fitness Goal</span>
+                                <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">{t('fitnessGoal')}</span>
                            </label>
                         </div>
                         
                         {profile.primaryGoal?.type === 'Medical' && (
                             <div className="mt-4">
                                <select name="detail" onChange={handleGoalChange} className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500">
-                                    <option>Diabetes</option>
-                                    <option>Hypertension</option>
-                                    <option>PCOS</option>
-                                    <option>Custom</option>
+                                    {medicalGoalOptions.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
                                </select>
-                               {profile.primaryGoal?.detail === 'Custom' && <input type="text" name="customDetail" placeholder="Specify condition" onChange={handleGoalChange} className="mt-2 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm" />}
+                               {profile.primaryGoal?.detail === 'Custom' && <input type="text" name="customDetail" placeholder={t('specifyCondition')} onChange={handleGoalChange} className="mt-2 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm" />}
                             </div>
                         )}
                          {profile.primaryGoal?.type === 'Fitness' && (
                             <div className="mt-4">
                                <select name="detail" defaultValue="Weight Loss" onChange={handleGoalChange} className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500">
-                                    <option>Weight Loss</option>
-                                    <option>Muscle Gain</option>
-                                    <option>Maintenance</option>
-                                    <option>Custom</option>
+                                    {fitnessGoalOptions.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
                                </select>
-                               {profile.primaryGoal?.detail === 'Custom' && <input type="text" name="customDetail" placeholder="Specify goal" onChange={handleGoalChange} className="mt-2 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm" />}
+                               {profile.primaryGoal?.detail === 'Custom' && <input type="text" name="customDetail" placeholder={t('specifyGoal')} onChange={handleGoalChange} className="mt-2 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm" />}
                             </div>
                         )}
                     </div>
