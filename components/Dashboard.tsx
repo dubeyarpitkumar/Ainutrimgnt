@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { UserProfile, NutritionInfo, DashboardView, ScanMode, MealPlan, ShoppingList, WorkoutPlan, MoodLog, CommunityPost } from '../types';
 import { analyzeFoodImage, generateMealPlan, generateShoppingList, generateWorkoutPlan } from '../services/geminiService';
@@ -821,10 +820,23 @@ const Dashboard: React.FC<DashboardProps> = ({ userProfile, onLogout }) => {
         const root = document.documentElement;
 
         if (goal.type === 'Medical') {
-            root.setAttribute('data-theme', 'blue');
-        } else if (goal.type === 'Fitness' && goal.detail === 'Muscle Gain') {
-            root.setAttribute('data-theme', 'orange');
+            root.setAttribute('data-theme', 'purple');
+        } else if (goal.type === 'Fitness') {
+            switch (goal.detail) {
+                case 'Muscle Gain':
+                    root.setAttribute('data-theme', 'orange');
+                    break;
+                case 'Maintenance':
+                    root.setAttribute('data-theme', 'blue');
+                    break;
+                case 'Weight Loss':
+                default:
+                    // Default green theme
+                    root.removeAttribute('data-theme');
+                    break;
+            }
         } else {
+             // Default green theme
             root.removeAttribute('data-theme');
         }
 
