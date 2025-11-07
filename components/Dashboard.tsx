@@ -1,7 +1,8 @@
+
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { UserProfile, NutritionInfo, DashboardView, ScanMode, MealPlan, ShoppingList, WorkoutPlan, MoodLog, CommunityPost } from '../types';
 import { analyzeFoodImage, generateMealPlan, generateShoppingList, generateWorkoutPlan } from '../services/geminiService';
-import { SunIcon, MoonIcon, CameraIcon, QrCodeIcon, UploadIcon, UserIcon, LogoutIcon, LanguageIcon, ChevronDownIcon, CheckCircleIcon, AlertTriangleIcon, XCircleIcon, TrendingUpIcon, HistoryIcon, HomeIcon, MealPlanIcon, CommunityIcon, DumbbellIcon, UsersIcon, BrainCircuitIcon, SparklesIcon, ThumbsUpIcon, MessageCircleIcon } from './Icons';
+import { SunIcon, MoonIcon, CameraIcon, QrCodeIcon, UploadIcon, UserIcon, LogoutIcon, LanguageIcon, ChevronDownIcon, CheckCircleIcon, AlertTriangleIcon, XCircleIcon, TrendingUpIcon, HistoryIcon, HomeIcon, MealPlanIcon, CommunityIcon, DumbbellIcon, UsersIcon, BrainCircuitIcon, SparklesIcon, ThumbsUpIcon, MessageCircleIcon, ChevronLeftIcon, MenuIcon, XIcon } from './Icons';
 import { useLanguage } from '../App';
 
 type Page = 'DASHBOARD' | 'PROGRESS' | 'HISTORY' | 'MEAL_PLAN' | 'WORKOUTS' | 'WELLNESS' | 'COMMUNITY' | 'CONSULTATIONS';
@@ -667,6 +668,77 @@ const ConsultationsPage: React.FC = () => {
     );
 };
 
+// Reusable Sidebar Navigation
+const SidebarNav: React.FC<{
+    activePage: Page;
+    onPageChange: (page: Page) => void;
+    isCollapsed: boolean;
+    t: (key: any) => string;
+}> = ({ activePage, onPageChange, isCollapsed, t }) => {
+    // FIX: Add `as const` to infer literal types for `page`, making it compatible with the `Page` type.
+    const navItems = [
+        { page: 'DASHBOARD', icon: HomeIcon, label: t('dashboard') },
+        { page: 'MEAL_PLAN', icon: MealPlanIcon, label: t('mealPlan') },
+        { page: 'WORKOUTS', icon: DumbbellIcon, label: t('workouts') },
+        { page: 'WELLNESS', icon: BrainCircuitIcon, label: t('wellness') },
+        { page: 'PROGRESS', icon: TrendingUpIcon, label: t('trackProgress') },
+        { page: 'HISTORY', icon: HistoryIcon, label: t('history') },
+    ] as const;
+    // FIX: Add `as const` to infer literal types for `page`, making it compatible with the `Page` type.
+    const secondaryNavItems = [
+        { page: 'COMMUNITY', icon: CommunityIcon, label: t('community'), premium: false },
+        { page: 'CONSULTATIONS', icon: UsersIcon, label: t('consultExperts'), premium: true },
+    ] as const;
+
+    const NavButton = ({ page, icon: Icon, label, isPremium }: { page: Page; icon: React.ElementType; label: string; isPremium?: boolean }) => (
+        <button
+            onClick={() => onPageChange(page)}
+            className={`relative flex items-center p-2 rounded-lg transition-colors w-full ${activePage === page ? 'bg-primary-100 dark:bg-primary-900/50 text-primary-600 dark:text-primary-300' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'} ${isCollapsed ? 'justify-center' : ''}`}
+        >
+            <Icon className="w-6 h-6 flex-shrink-0" />
+            <span className={`ml-3 whitespace-nowrap ${isCollapsed ? 'hidden' : ''}`}>{label}</span>
+            {isPremium && (
+                <span className={`absolute top-1 right-1 p-0.5 text-xs bg-yellow-400 text-white rounded-full ${isCollapsed ? 'hidden' : ''}`}>
+                    <SparklesIcon className="w-3 h-3"/>
+                </span>
+            )}
+        </button>
+    );
+
+    return (
+        <nav className="flex flex-col space-y-2">
+            {navItems.map(item => <NavButton key={item.page} {...item} />)}
+            <div className="pt-2 mt-2 border-t dark:border-gray-700">
+                {secondaryNavItems.map(item => <NavButton key={item.page} page={item.page} icon={item.icon} label={item.label} isPremium={item.premium} />)}
+            </div>
+        </nav>
+    );
+};
+
+// Mobile Off-Canvas Sidebar
+const MobileSidebar: React.FC<{ isOpen: boolean; onClose: () => void; children: React.ReactNode }> = ({ isOpen, onClose, children }) => {
+    return (
+        <>
+            <div
+                className={`fixed inset-0 bg-black/60 z-40 transition-opacity duration-300 sm:hidden ${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+                onClick={onClose}
+                aria-hidden="true"
+            />
+            <div className={`fixed top-0 left-0 bottom-0 w-64 bg-white dark:bg-gray-800 z-50 transition-transform duration-300 transform sm:hidden ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+                <div className="flex items-center justify-between p-4 border-b dark:border-gray-700">
+                    <h2 className="text-xl font-bold text-primary-600 dark:text-primary-400">NutriScan AI</h2>
+                    <button onClick={onClose} className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
+                        <XIcon className="w-6 h-6" />
+                    </button>
+                </div>
+                <div className="p-2">
+                    {children}
+                </div>
+            </div>
+        </>
+    );
+};
+
 // Main Dashboard Component
 interface DashboardProps {
     userProfile: UserProfile;
@@ -694,6 +766,8 @@ const Dashboard: React.FC<DashboardProps> = ({ userProfile, onLogout }) => {
         const saved = localStorage.getItem('moodHistory');
         return saved ? JSON.parse(saved) : [];
     });
+    const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     
     // Dynamic Theming Effect
     useEffect(() => {
@@ -708,7 +782,6 @@ const Dashboard: React.FC<DashboardProps> = ({ userProfile, onLogout }) => {
             root.removeAttribute('data-theme');
         }
 
-        // Cleanup function to remove the theme when the dashboard unmounts (e.g., on logout)
         return () => {
             root.removeAttribute('data-theme');
         }
@@ -795,6 +868,14 @@ const Dashboard: React.FC<DashboardProps> = ({ userProfile, onLogout }) => {
             fileInputRef.current.value = "";
         }
     };
+
+    const handlePageChange = (page: Page) => {
+        setActivePage(page);
+        setIsMobileMenuOpen(false); // Close mobile menu on nav
+        if (page === 'DASHBOARD') {
+            resetView();
+        }
+    };
     
     const renderMainContent = () => {
         if (activePage === 'PROGRESS') return <TrackProgressPage />;
@@ -864,8 +945,17 @@ const Dashboard: React.FC<DashboardProps> = ({ userProfile, onLogout }) => {
     
     return (
         <div className="flex flex-col h-screen">
-            <header className="flex items-center justify-between p-4 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm sticky top-0 z-40 border-b dark:border-gray-700">
-                <h1 className="text-2xl font-bold text-primary-600 dark:text-primary-400">NutriScan AI</h1>
+             <MobileSidebar isOpen={isMobileMenuOpen} onClose={() => setIsMobileMenuOpen(false)}>
+                <SidebarNav activePage={activePage} onPageChange={handlePageChange} isCollapsed={false} t={t} />
+            </MobileSidebar>
+
+            <header className="flex items-center justify-between p-4 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm sticky top-0 z-30 border-b dark:border-gray-700">
+                <div className="flex items-center gap-4">
+                    <button onClick={() => setIsMobileMenuOpen(true)} className="sm:hidden p-1 -ml-1 text-gray-600 dark:text-gray-300">
+                         <MenuIcon className="w-6 h-6" />
+                    </button>
+                    <h1 className="text-2xl font-bold text-primary-600 dark:text-primary-400">NutriScan AI</h1>
+                </div>
                 <div className="flex items-center space-x-2 md:space-x-4">
                     <LanguageSelector />
                     <ThemeToggle />
@@ -873,46 +963,20 @@ const Dashboard: React.FC<DashboardProps> = ({ userProfile, onLogout }) => {
                 </div>
             </header>
             <div className="flex flex-1 overflow-hidden min-h-0">
-                <aside className="w-16 md:w-56 bg-white dark:bg-gray-800 p-2 md:p-4 border-r dark:border-gray-700 hidden sm:block">
-                     <nav className="flex flex-col space-y-2">
-                        <button onClick={() => { setActivePage('DASHBOARD'); resetView(); }} className={`flex items-center p-2 rounded-lg transition-colors ${activePage === 'DASHBOARD' ? 'bg-primary-100 dark:bg-primary-900/50 text-primary-600 dark:text-primary-300' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'}`}>
-                            <HomeIcon className="w-6 h-6" />
-                            <span className="ml-3 hidden md:inline">{t('dashboard')}</span>
+                <aside className={`transition-all duration-300 bg-white dark:bg-gray-800 border-r dark:border-gray-700 hidden sm:flex flex-col ${isSidebarCollapsed ? 'w-20 p-2' : 'w-56 p-4'}`}>
+                    <div className="flex-1">
+                        <SidebarNav activePage={activePage} onPageChange={handlePageChange} isCollapsed={isSidebarCollapsed} t={t} />
+                    </div>
+                     <div className="mt-auto pt-4 border-t dark:border-gray-700">
+                        <button 
+                            onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)} 
+                            className={`flex items-center w-full p-2 rounded-lg transition-colors text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 ${isSidebarCollapsed ? 'justify-center' : ''}`}
+                            aria-label={isSidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+                        >
+                            <ChevronLeftIcon className={`w-6 h-6 transition-transform duration-300 flex-shrink-0 ${isSidebarCollapsed ? 'rotate-180' : ''}`} />
+                            <span className={`ml-3 whitespace-nowrap ${isSidebarCollapsed ? 'hidden' : ''}`}>Collapse</span>
                         </button>
-                        <button onClick={() => setActivePage('MEAL_PLAN')} className={`flex items-center p-2 rounded-lg transition-colors ${activePage === 'MEAL_PLAN' ? 'bg-primary-100 dark:bg-primary-900/50 text-primary-600 dark:text-primary-300' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'}`}>
-                            <MealPlanIcon className="w-6 h-6" />
-                            <span className="ml-3 hidden md:inline">{t('mealPlan')}</span>
-                        </button>
-                        <button onClick={() => setActivePage('WORKOUTS')} className={`flex items-center p-2 rounded-lg transition-colors ${activePage === 'WORKOUTS' ? 'bg-primary-100 dark:bg-primary-900/50 text-primary-600 dark:text-primary-300' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'}`}>
-                            <DumbbellIcon className="w-6 h-6" />
-                            <span className="ml-3 hidden md:inline">{t('workouts')}</span>
-                        </button>
-                         <button onClick={() => setActivePage('WELLNESS')} className={`flex items-center p-2 rounded-lg transition-colors ${activePage === 'WELLNESS' ? 'bg-primary-100 dark:bg-primary-900/50 text-primary-600 dark:text-primary-300' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'}`}>
-                            <BrainCircuitIcon className="w-6 h-6" />
-                            <span className="ml-3 hidden md:inline">{t('wellness')}</span>
-                        </button>
-                         <button onClick={() => setActivePage('PROGRESS')} className={`flex items-center p-2 rounded-lg transition-colors ${activePage === 'PROGRESS' ? 'bg-primary-100 dark:bg-primary-900/50 text-primary-600 dark:text-primary-300' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'}`}>
-                            <TrendingUpIcon className="w-6 h-6" />
-                            <span className="ml-3 hidden md:inline">{t('trackProgress')}</span>
-                        </button>
-                        <button onClick={() => setActivePage('HISTORY')} className={`flex items-center p-2 rounded-lg transition-colors ${activePage === 'HISTORY' ? 'bg-primary-100 dark:bg-primary-900/50 text-primary-600 dark:text-primary-300' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'}`}>
-                            <HistoryIcon className="w-6 h-6" />
-                            <span className="ml-3 hidden md:inline">{t('history')}</span>
-                        </button>
-                        <div className="pt-2 mt-2 border-t dark:border-gray-700">
-                             <button onClick={() => setActivePage('COMMUNITY')} className={`flex items-center p-2 rounded-lg transition-colors w-full ${activePage === 'COMMUNITY' ? 'bg-primary-100 dark:bg-primary-900/50 text-primary-600 dark:text-primary-300' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'}`}>
-                                <CommunityIcon className="w-6 h-6" />
-                                <span className="ml-3 hidden md:inline">{t('community')}</span>
-                            </button>
-                             <button onClick={() => setActivePage('CONSULTATIONS')} className={`relative flex items-center p-2 rounded-lg transition-colors w-full ${activePage === 'CONSULTATIONS' ? 'bg-primary-100 dark:bg-primary-900/50 text-primary-600 dark:text-primary-300' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'}`}>
-                                <UsersIcon className="w-6 h-6" />
-                                <span className="ml-3 hidden md:inline">{t('consultExperts')}</span>
-                                <span className="absolute top-1 right-1 md:right-3 p-0.5 text-xs bg-yellow-400 text-white rounded-full">
-                                    <SparklesIcon className="w-3 h-3"/>
-                                </span>
-                            </button>
-                        </div>
-                    </nav>
+                    </div>
                 </aside>
                 <main className="flex-1 overflow-y-auto p-4 md:p-8">
                    {renderMainContent()}
