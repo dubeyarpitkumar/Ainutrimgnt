@@ -246,7 +246,14 @@ const AnalysisResult: React.FC<{ result: NutritionInfo, onBack: () => void, scan
     
     return (
         <div className="w-full max-w-2xl mx-auto p-4 md:p-6 space-y-6">
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
+            <div className="relative bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
+                <button 
+                    onClick={onBack} 
+                    className="absolute top-4 right-4 p-2 rounded-full text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors z-10"
+                    aria-label="Close"
+                >
+                    <XIcon className="w-6 h-6" />
+                </button>
                 {scannedImage && (
                     <img src={scannedImage} alt={result.foodName} className="w-full h-64 object-cover" />
                 )}
