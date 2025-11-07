@@ -1,7 +1,9 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { GoogleGenAI, Chat } from '@google/genai';
 import { MessageCircleIcon, XIcon, SparklesIcon } from './Icons';
 import { UserProfile } from '../types';
+import { useLanguage } from '../App';
 
 interface ChatbotProps {
     userProfile: UserProfile;
@@ -13,6 +15,7 @@ interface Message {
 }
 
 export const Chatbot: React.FC<ChatbotProps> = ({ userProfile }) => {
+    const { language, t } = useLanguage();
     const [isOpen, setIsOpen] = useState(false);
     const [messages, setMessages] = useState<Message[]>([]);
     const [chat, setChat] = useState<Chat | null>(null);
@@ -29,27 +32,36 @@ export const Chatbot: React.FC<ChatbotProps> = ({ userProfile }) => {
     }, [messages, isLoading]);
 
     useEffect(() => {
-        if (isOpen && !chat) {
+        if (isOpen) {
             try {
                 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY! });
+
+                const systemInstruction = language === 'hi'
+                    ? `आप NutriScan AI के लिए एक मैत्रीपूर्ण और सहायक AI सहायक हैं, जो एक पोषण ट्रैकिंग ऐप है। उपयोगकर्ता का नाम ${userProfile.name} है। कभी-कभी उन्हें उनके नाम से संबोधित करें। आपकी भूमिका ऐप की विशेषताओं के बारे में उपयोगकर्ता के सवालों का जवाब देना है। अपने उत्तर संक्षिप्त, सहायक और उत्साहजनक रखें। स्वास्थ्य, फिटनेस, या NutriScan AI ऐप से असंबंधित सवालों का जवाब न दें। आपको हमेशा हिंदी में जवाब देना चाहिए।`
+                    : `You are a friendly and helpful AI assistant for NutriScan AI, a nutrition tracking app. The user's name is ${userProfile.name}. Address them by their name occasionally. Your role is to answer user questions about the app's features. Keep your answers concise, helpful, and encouraging. Do not answer questions unrelated to health, fitness, or the NutriScan AI app.`;
+
                 const chatSession = ai.chats.create({
                     model: 'gemini-2.5-flash',
                     config: {
-                        systemInstruction: `You are a friendly and helpful AI assistant for NutriScan AI, a nutrition tracking app. The user's name is ${userProfile.name}. Address them by their name occasionally. Your role is to answer user questions about the app's features. Keep your answers concise, helpful, and encouraging. Do not answer questions unrelated to health, fitness, or the NutriScan AI app.`,
+                        systemInstruction,
                     },
                 });
                 setChat(chatSession);
                 setMessages([
-                    { role: 'model', content: `Hello ${userProfile.name.split(' ')[0]}! How can I help you with NutriScan AI today?` }
+                    { role: 'model', content: t('howCanIHelp', { name: userProfile.name.split(' ')[0] }) }
                 ]);
             } catch (error) {
                 console.error("Failed to initialize chatbot:", error);
                  setMessages([
-                    { role: 'model', content: "Sorry, the chat assistant is currently unavailable." }
+                    { role: 'model', content: t('chatUnavailable') }
                 ]);
             }
+        } else {
+            // Reset chat state when the component is closed
+            setChat(null);
+            setMessages([]);
         }
-    }, [isOpen, chat, userProfile.name]);
+    }, [isOpen, language, userProfile.name, t]);
 
     const handleSend = async (messageText?: string) => {
         const text = (messageText || input).trim();
@@ -83,7 +95,7 @@ export const Chatbot: React.FC<ChatbotProps> = ({ userProfile }) => {
                 if (newMessages[newMessages.length-1].content === '') {
                     newMessages.pop();
                 }
-                return [...newMessages, { role: 'model', content: 'Sorry, I had trouble connecting. Please try again.' }];
+                return [...newMessages, { role: 'model', content: t('tryAgainLater') }];
             });
         } finally {
             setIsLoading(false);
@@ -96,10 +108,10 @@ export const Chatbot: React.FC<ChatbotProps> = ({ userProfile }) => {
     };
 
     const faqs = [
-        "How do I scan food?",
-        "How does meal planning work?",
-        "Explain the workout generator.",
-        "What does 'Should Eat' mean?",
+        t('faqScanFood'),
+        t('faqMealPlan'),
+        t('faqWorkout'),
+        t('faqRecommendation'),
     ];
 
     return (
@@ -109,7 +121,7 @@ export const Chatbot: React.FC<ChatbotProps> = ({ userProfile }) => {
                 <div className="flex items-center justify-between p-4 border-b dark:border-gray-700 flex-shrink-0">
                     <div className="flex items-center space-x-2">
                         <SparklesIcon className="w-6 h-6 text-primary-500" />
-                        <h3 className="font-bold text-lg">NutriScan Assistant</h3>
+                        <h3 className="font-bold text-lg">{t('nutriScanAssistant')}</h3>
                     </div>
                      <button onClick={() => setIsOpen(false)} className="p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
                         <XIcon className="w-5 h-5" />
@@ -142,7 +154,7 @@ export const Chatbot: React.FC<ChatbotProps> = ({ userProfile }) => {
                 {/* FAQs */}
                 {messages.length <= 2 && (
                     <div className="p-4 border-t dark:border-gray-700 flex-shrink-0">
-                         <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">Or try one of these:</p>
+                         <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">{t('tryOneOfThese')}</p>
                         <div className="flex flex-wrap gap-2">
                             {faqs.map(faq => (
                                 <button key={faq} onClick={() => handleSend(faq)} disabled={isLoading} className="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-sm rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 disabled:opacity-50">
@@ -160,7 +172,7 @@ export const Chatbot: React.FC<ChatbotProps> = ({ userProfile }) => {
                             type="text"
                             value={input}
                             onChange={(e) => setInput(e.target.value)}
-                            placeholder="Ask a question..."
+                            placeholder={t('askAQuestion')}
                             className="w-full px-4 py-2 bg-gray-100 dark:bg-gray-700 border border-transparent rounded-full focus:outline-none focus:ring-2 focus:ring-primary-500"
                         />
                         <button type="submit" disabled={isLoading || !input.trim()} className="p-2 bg-primary-600 text-white rounded-full hover:bg-primary-700 disabled:bg-primary-300 transition-colors flex-shrink-0">

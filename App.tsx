@@ -100,6 +100,17 @@ const translations = {
     premiumFeature: "PREMIUM FEATURE",
     bookExpertConsultations: "Book 1-on-1 Expert Consultations",
     upgradeToPremium: "Upgrade to Premium",
+    // Chatbot
+    nutriScanAssistant: "NutriScan Assistant",
+    howCanIHelp: "Hello, {{name}}! How can I help you with NutriScan AI today?",
+    chatUnavailable: "Sorry, the chat assistant is currently unavailable.",
+    tryAgainLater: "Sorry, I had trouble connecting. Please try again.",
+    tryOneOfThese: "Or try one of these:",
+    askAQuestion: "Ask a question...",
+    faqScanFood: "How do I scan food?",
+    faqMealPlan: "How does meal planning work?",
+    faqWorkout: "Explain the workout generator.",
+    faqRecommendation: "What does 'Should Eat' mean?",
   },
   hi: {
     // Auth
@@ -193,6 +204,17 @@ const translations = {
     premiumFeature: "प्रीमियम सुविधा",
     bookExpertConsultations: "विशेषज्ञों के साथ 1-पर-1 परामर्श बुक करें",
     upgradeToPremium: "प्रीमियम में अपग्रेड करें",
+    // Chatbot
+    nutriScanAssistant: "न्यूट्रिशन असिस्टेंट",
+    howCanIHelp: "नमस्ते, {{name}}! मैं आज न्यूट्रिशन एआई में आपकी कैसे मदद कर सकता हूँ?",
+    chatUnavailable: "क्षमा करें, चैट सहायक वर्तमान में अनुपलब्ध है।",
+    tryAgainLater: "क्षमा करें, मुझे कनेक्ट करने में समस्या हुई। कृपया पुनः प्रयास करें।",
+    tryOneOfThese: "या इनमें से कोई एक आज़माएँ:",
+    askAQuestion: "एक सवाल पूछें...",
+    faqScanFood: "मैं भोजन कैसे स्कैन करूं?",
+    faqMealPlan: "भोजन योजना कैसे काम करती है?",
+    faqWorkout: "वर्कआउट जेनरेटर समझाएं।",
+    faqRecommendation: "'खाना चाहिए' का क्या मतलब है?",
   }
 };
 
