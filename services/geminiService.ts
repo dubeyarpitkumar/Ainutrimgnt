@@ -140,6 +140,56 @@ const workoutPlanResponseSchema = {
     required: ["weeklyWorkoutPlan"]
 };
 
+const translationResponseSchema = {
+    type: Type.OBJECT,
+    properties: {
+        translations: {
+            type: Type.ARRAY,
+            items: {
+                type: Type.STRING
+            },
+            description: "An array of translated strings, in the same order as the input."
+        }
+    },
+    required: ["translations"]
+};
+
+export const translateTexts = async (texts: string[], targetLanguage: 'Hindi'): Promise<string[]> => {
+    if (!texts || texts.length === 0) {
+        return [];
+    }
+
+    const validTexts = texts.map(t => t || "");
+    if (validTexts.every(t => t === "")) {
+        return validTexts;
+    }
+
+    const prompt = `Translate the following list of English texts to ${targetLanguage}.
+    - Maintain the original order of the texts in your translated response.
+    - Return the result ONLY in the specified JSON format.
+
+    Texts to translate:
+    ${JSON.stringify(validTexts)}
+    `;
+
+    try {
+        const response = await ai.models.generateContent({
+            model: 'gemini-2.5-flash',
+            contents: { parts: [{ text: prompt }] },
+            config: {
+                responseMimeType: "application/json",
+                responseSchema: translationResponseSchema,
+            },
+        });
+        const jsonText = response.text;
+        const result = JSON.parse(jsonText);
+        return result.translations as string[];
+    } catch (error) {
+        console.error("Error translating texts:", error);
+        return texts; // Fallback to original text on error
+    }
+};
+
 
 const getUserProfileSummary = (userProfile: UserProfile) => `
     - Age: ${userProfile.age}

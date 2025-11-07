@@ -1,7 +1,7 @@
-
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { UserProfile, NutritionInfo, DashboardView, ScanMode, MealPlan, ShoppingList, WorkoutPlan, MoodLog, CommunityPost } from '../types';
 import { analyzeFoodImage, generateMealPlan, generateShoppingList, generateWorkoutPlan } from '../services/geminiService';
+import { translateNutritionInfo, translateMealPlan, translateShoppingList, translateWorkoutPlan } from '../utils/translator';
 import { SunIcon, MoonIcon, CameraIcon, QrCodeIcon, UploadIcon, UserIcon, LogoutIcon, LanguageIcon, ChevronDownIcon, CheckCircleIcon, AlertTriangleIcon, XCircleIcon, TrendingUpIcon, HistoryIcon, HomeIcon, MealPlanIcon, CommunityIcon, DumbbellIcon, UsersIcon, BrainCircuitIcon, SparklesIcon, ThumbsUpIcon, MessageCircleIcon, ChevronLeftIcon, MenuIcon, XIcon } from './Icons';
 import { useLanguage } from '../App';
 import { Chatbot } from './Chatbot';
@@ -409,7 +409,7 @@ const TrackProgressPage: React.FC = () => {
 
 // New Page Component: Meal Plan
 const MealPlanPage: React.FC<{ userProfile: UserProfile }> = ({ userProfile }) => {
-    const { t } = useLanguage();
+    const { t, language } = useLanguage();
     const [mealPlan, setMealPlan] = useState<MealPlan | null>(null);
     const [shoppingList, setShoppingList] = useState<ShoppingList | null>(null);
     const [isLoading, setIsLoading] = useState(false);
@@ -421,7 +421,8 @@ const MealPlanPage: React.FC<{ userProfile: UserProfile }> = ({ userProfile }) =
         setShoppingList(null);
         try {
             const plan = await generateMealPlan(userProfile);
-            setMealPlan(plan);
+            const translatedPlan = await translateMealPlan(plan, language);
+            setMealPlan(translatedPlan);
         } catch (e) {
             setError(e instanceof Error ? e.message : "Failed to generate plan.");
         } finally {
@@ -435,7 +436,8 @@ const MealPlanPage: React.FC<{ userProfile: UserProfile }> = ({ userProfile }) =
         setError(null);
          try {
             const list = await generateShoppingList(mealPlan);
-            setShoppingList(list);
+            const translatedList = await translateShoppingList(list, language);
+            setShoppingList(translatedList);
         } catch (e) {
             setError(e instanceof Error ? e.message : "Failed to generate shopping list.");
         } finally {
@@ -495,7 +497,7 @@ const MealPlanPage: React.FC<{ userProfile: UserProfile }> = ({ userProfile }) =
 
 // New Page Component: Workout Plan
 const WorkoutPage: React.FC<{ userProfile: UserProfile }> = ({ userProfile }) => {
-    const { t } = useLanguage();
+    const { t, language } = useLanguage();
     const [workoutPlan, setWorkoutPlan] = useState<WorkoutPlan | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -505,7 +507,8 @@ const WorkoutPage: React.FC<{ userProfile: UserProfile }> = ({ userProfile }) =>
         setError(null);
         try {
             const plan = await generateWorkoutPlan(userProfile);
-            setWorkoutPlan(plan);
+            const translatedPlan = await translateWorkoutPlan(plan, language);
+            setWorkoutPlan(translatedPlan);
         } catch (e) {
             setError(e instanceof Error ? e.message : "Failed to generate workout plan.");
         } finally {
@@ -788,7 +791,7 @@ interface DashboardProps {
 }
 
 const Dashboard: React.FC<DashboardProps> = ({ userProfile, onLogout }) => {
-    const { t } = useLanguage();
+    const { t, language } = useLanguage();
     const [view, setView] = useState<DashboardView>('HOME');
     const [scanMode, setScanMode] = useState<ScanMode>(null);
     const [analysisResult, setAnalysisResult] = useState<NutritionInfo | null>(null);
@@ -877,7 +880,8 @@ const Dashboard: React.FC<DashboardProps> = ({ userProfile, onLogout }) => {
         setView('ANALYZING');
         setError(null);
         try {
-            const result = await analyzeFoodImage(data, mimeType, userProfile, mode);
+            let result = await analyzeFoodImage(data, mimeType, userProfile, mode);
+            result = await translateNutritionInfo(result, language);
             setAnalysisResult(result);
             
             const newHistory = [result, ...scanHistory];
@@ -895,7 +899,7 @@ const Dashboard: React.FC<DashboardProps> = ({ userProfile, onLogout }) => {
             setError(e instanceof Error ? e.message : "An unknown error occurred.");
             setView('ERROR');
         }
-    }, [userProfile, scanHistory]);
+    }, [userProfile, scanHistory, language]);
     
     const handleCapture = (imageData: string, mimeType: string) => {
         performAnalysis(imageData, mimeType, scanMode);
