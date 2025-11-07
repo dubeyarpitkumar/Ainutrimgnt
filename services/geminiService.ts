@@ -164,7 +164,10 @@ export const translateTexts = async (texts: string[], targetLanguage: 'Hindi'): 
         return validTexts;
     }
 
-    const prompt = `Translate the following list of English texts to ${targetLanguage}.
+    const prompt = `Translate the following list of English texts to conversational, colloquial Hindi, as if a friendly health assistant is speaking directly to a user.
+    - Use direct addressing like 'आप' and 'आपका'.
+    - The tone must be encouraging, friendly, and easy to understand, not formal or "bookish".
+    - For recommendations or reasons, phrase them as direct, actionable advice. For example, translate "This food is high in sugar which can hinder weight loss goals." to something like "इसमें चीनी ज़्यादा है, जो आपके वज़न घटाने के लक्ष्य के लिए ठीक नहीं है। इसे कम ही खाएं।"
     - Maintain the original order of the texts in your translated response.
     - Return the result ONLY in the specified JSON format.
 
