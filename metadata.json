@@ -1,0 +1,7 @@
+{
+  "name": "NutriScan AI",
+  "description": "An intelligent nutrition tracker that analyzes food from images using AI. Users can sign up, complete an onboarding profile, and then scan food via camera or upload images to get a detailed nutritional breakdown, personalized recommendations, and serving size suggestions.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
